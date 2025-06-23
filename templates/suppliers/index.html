@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Proveedores - SuperMarket Pro{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 fw-bold text-dark">Proveedores</h1>
+        <p class="text-muted mb-0">Gestiona los proveedores del supermercado</p>
+    </div>
+    <a href="{{ url_for('suppliers.add') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-plus-circle me-2"></i>Nuevo Proveedor
+    </a>
+</div>
+
+<!-- Search -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar proveedores..." id="searchInput">
+        </div>
+    </div>
+</div>
+
+<!-- Suppliers Grid -->
+<div class="row g-4">
+    {% for supplier in suppliers %}
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 searchable-item">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-warning bg-gradient rounded-circle p-3">
+                        <i class="bi bi-truck text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('suppliers.view', id=supplier.id) }}">
+                                <i class="bi bi-eye me-2"></i>Ver Detalles
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('suppliers.edit', id=supplier.id) }}">
+                                <i class="bi bi-pencil me-2"></i>Editar
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ url_for('suppliers.delete', id=supplier.id) }}" class="d-inline"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este proveedor?')">
+                                    {{ csrf_token() }}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-trash me-2"></i>Eliminar
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h5 class="card-title fw-bold">{{ supplier.name }}</h5>
+                <p class="text-muted mb-3">{{ supplier.contact_person }}</p>
+                
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-envelope text-muted me-2"></i>
+                        <small>{{ supplier.email or 'Sin email' }}</small>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-telephone text-muted me-2"></i>
+                        <small>{{ supplier.phone or 'Sin teléfono' }}</small>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-geo-alt text-muted me-2 mt-1"></i>
+                        <small>{{ supplier.address or 'Sin dirección' }}</small>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold text-primary">{{ supplier.products|length }}</span>
+                        <small class="text-muted">productos</small>
+                    </div>
+                    <span class="badge {{ 'bg-success' if supplier.is_active else 'bg-secondary' }}">
+                        {{ 'Activo' if supplier.is_active else 'Inactivo' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not suppliers %}
+<div class="text-center py-5">
+    <i class="bi bi-truck text-muted" style="font-size: 4rem;"></i>
+    <h4 class="text-muted mt-3">No hay proveedores registrados</h4>
+    <p class="text-muted">Comienza agregando tu primer proveedor</p>
+    <a href="{{ url_for('suppliers.add') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Agregar Proveedor
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda en tiempo real
+initializeSearch('searchInput', '.searchable-item');
+</script>
+{% endblock %}
